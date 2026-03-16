@@ -948,18 +948,18 @@ async function loadAllCharts() {
   try {
     await ensureToken();
 
-    // Indicators we want
+    // Indicators we want (priority order)
     const allowedNames = [
-      "Remaining Thickness (mm) - Soft sensor prediction",
-      "Remaining Thickness (mm) - Hard sensor"
+      "Remaining Thickness (mm) - Hard sensor",
+      "Remaining Thickness (mm) - Soft sensor prediction"
     ];
 
-    // Filter only required indicators
-    const remainingIndicators = indicators.filter(ind =>
-      allowedNames.includes(ind.name)
-    );
+    // Filter and sort by priority
+    const remainingIndicators = allowedNames
+      .map(name => indicators.find(ind => ind.name === name))
+      .filter(Boolean);
 
-    // Fetch logs only for those indicators
+    // Fetch logs
     const results = await Promise.all(
       remainingIndicators.map(ind =>
         fetchIndicatorLogs(ind._id, startDate, endDate)
